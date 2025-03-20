@@ -1,22 +1,32 @@
 class Person:
-    moods = ("happy", "tired", "lazy")
-    
+    moods = ("Happy", "Tired", "Lazy")
+
     def __init__(self, name, money, mood, healthRate):
         self.name = name
         self.money = money
         self.mood = mood
-        self.healthRate = max(0, min(healthRate, 100))
-    
+        self.healthRate = healthRate
+
     def sleep(self, hours):
         if hours == 7:
-            self.mood = "happy"
+            self.mood = self.moods[0]  
         elif hours < 7:
-            self.mood = "tired"
+            self.mood = self.moods[1]  
         else:
-            self.mood = "lazy"
-    
+            self.mood = self.moods[2]  
+
     def eat(self, meals):
-        self.healthRate = max(0, min(100, meals * 50))
-    
+        if meals == 3:
+            self.healthRate = 100
+        elif meals == 2:
+            self.healthRate = 75
+        elif meals == 1:
+            self.healthRate = 50
+
     def buy(self, items):
-        self.money -= items * 10
+        self.money -= items * 10  
+
+
+
+person1 = Person("Maha", 500, "Happy", 100)
+
