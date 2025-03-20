@@ -1,0 +1,20 @@
+{
+    "name": "ITI",
+    "employees": [
+        {
+            "name": "Maha",
+            "money": 4990,
+            "mood": "Tired",
+            "healthRate": 90,
+            "id": 101,
+            "car": {
+                "name": "Marcdez-Benz",
+                "fuelRate": 79.0,
+                "velocity": 0
+            },
+            "email": "maha@yahoo.com",
+            "salary": 1200,
+            "distanceToWork": 15
+        }
+    ]
+}
