@@ -1,29 +1,44 @@
+import re
 from Person import Person
-from Car import Car
 
 class Employee(Person):
-    def __init__(self, name, money, mood, healthRate, emp_id, car, email, salary, distanceToWork):
+    def __init__(self, name, money, mood, healthRate, id, car, email, salary, distanceToWork):
         super().__init__(name, money, mood, healthRate)
-        self.emp_id = emp_id
+        self.id = id
         self.car = car
-        self.email = email if "@" in email else "Invalid Email"
-        self.salary = max(1000, salary)
+        self._email = None  
+        self.salary = salary
         self.distanceToWork = distanceToWork
-    
+        self.email = email  
+   
     def work(self, hours):
+       
         if hours == 8:
-            self.mood = "happy"
+            self.mood = "Happy"
         elif hours > 8:
-            self.mood = "tired"
+            self.mood = "Tired"
         else:
-            self.mood = "lazy"
-    
+            self.mood = "Lazy"
     def drive(self, distance):
-        self.car.run(self.car.velocity, distance)
+        if self.car:
+            self.car.run(self.car.velocity, distance)
+        else:
+            print("This employee has no car to drive.")
+
+     
+    def is_valid_email(self, email):
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        return re.match(pattern, email) is not None
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, value):
+        if self.is_valid_email(value):  
+            self._email = value
+        else:
+            print("Invalid email address.")
     
-    def refuel(self, gasAmount=100):
-        self.car.fuelRate = min(100, self.car.fuelRate + gasAmount)
     
-    def send_mail(self, to, subject, msg, receiver_name):
-        with open("email.txt", "w") as f:
-            f.write(f"From: {self.email}\nTo: {to}\nHi, {receiver_name}\n{msg}\nSubject: {subject}")
