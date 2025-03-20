@@ -1,54 +1,105 @@
 import json
 from Employee import Employee
+from Car import Car
 
 class Office:
-    employeesNum = 0
-    
+    employeesNum = 0  
+
     def __init__(self, name):
         self.name = name
-        self.employees = []
-    
+        self.employees = []  
+
     def get_all_employees(self):
         return self.employees
-    
-    def get_employee(self, empId):
-        return next((emp for emp in self.employees if emp.emp_id == empId), None)
-    
+
+    def get_employee(self, emp_id):
+        return next((emp for emp in self.employees if emp.id == emp_id), None)
+
     def hire(self, employee):
-        self.employees.append(employee)
-        Office.employeesNum += 1
-    
-    def fire(self, empId):
-        self.employees = [emp for emp in self.employees if emp.emp_id != empId]
-        Office.employeesNum -= 1
-    
-    def deduct(self, empId, deduction):
-        emp = self.get_employee(empId)
+        if isinstance(employee, Employee):
+            self.employees.append(employee)
+            Office.employeesNum += 1
+        else:
+            print("Invalid employee object!")
+
+    def fire(self, emp_id):
+        emp = self.get_employee(emp_id)
         if emp:
-            emp.salary -= deduction
-    
-    def reward(self, empId, reward):
-        emp = self.get_employee(empId)
+            self.employees.remove(emp)
+            Office.employeesNum -= 1
+            return True
+        return False
+
+    def deduct(self, emp_id, deduction):
+        emp = self.get_employee(emp_id)
+        if emp and deduction > 0:
+            emp.money = max(0, emp.money - deduction)  
+        else:
+            print("Invalid deduction amount or employee not found.")
+
+    def reward(self, emp_id, reward):
+        emp = self.get_employee(emp_id)
+        if emp and reward > 0:
+            emp.money += reward
+        else:
+            print("Invalid reward amount or employee not found.")
+
+    def check_lateness(self, emp_id, moveHour):
+        emp = self.get_employee(emp_id)
         if emp:
-            emp.salary += reward
-    
-    def check_lateness(self, empId, moveHour):
-        emp = self.get_employee(empId)
-        if emp:
-            lateness = self.calculate_lateness(9, moveHour, emp.distanceToWork, emp.car.velocity)
-            if lateness:
-                self.deduct(empId, 10)
+            targetHour = 9  
+            distance = emp.distanceToWork
+            velocity = emp.car.velocity if emp.car else 0
+            is_late = Office.calculate_lateness(targetHour, moveHour, distance, velocity)
+
+            if is_late:
+                print(f"{emp.name} is late! Deducting 10 LE.")
+                self.deduct(emp.id, 10)
             else:
-                self.reward(empId, 10)
-    
+                print(f"{emp.name} is on time! Rewarding 10 LE.")
+                self.reward(emp.id, 10)
+
     @staticmethod
     def calculate_lateness(targetHour, moveHour, distance, velocity):
-        return (moveHour + distance / velocity) > targetHour
-    
+        
+        if velocity <= 0:  
+            return True
+        travel_time = distance / velocity
+        arrival_time = moveHour + travel_time
+        return arrival_time > targetHour
+
     @classmethod
     def change_emps_num(cls, num):
-        cls.employeesNum = num
-    
-    def save_to_json(self):
-        with open("office_data.json", "w") as f:
-            json.dump([emp.__dict__ for emp in self.employees], f)
+        
+        if num >= 0:
+            cls.employeesNum = num
+        else:
+            print("Invalid number of employees.")
+
+def save_office_data_to_json(office, filename="iti_data.json"):
+    office_data = {
+        "name": office.name,
+        "employees": [
+            {
+                "name": emp.name,
+                "money": emp.money,
+                "mood": emp.mood,
+                "healthRate": emp.healthRate,
+                "id": emp.id,
+                "car": {
+                    "name": emp.car.name,
+                    "fuelRate": emp.car.fuelRate,
+                    "velocity": emp.car.velocity
+                } if emp.car else None,
+                "email": emp.email,
+                "salary": emp.salary,
+                "distanceToWork": emp.distanceToWork
+            }
+            for emp in office.employees
+        ]
+    }
+
+    with open(filename, "w") as f:
+        json.dump(office_data, f, indent=4)
+
+    print(f"Office data saved to {filename}")
